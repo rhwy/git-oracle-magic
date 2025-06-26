@@ -82,6 +82,13 @@ app.Configure(config =>
         .WithExample(new[] { "timeline", "-p", ".", "--period", "weekly", "--top", "15" })
         .WithExample(new[] { "timeline", "--since", "2023-01-01", "--period", "daily", "--verbose" });
 
+    config.AddCommand<InteractiveCommand>("interactive")
+        .WithAlias("i")
+        .WithDescription("Run Git Oracle Magic in interactive mode with guided menus")
+        .WithExample(new[] { "interactive", "/path/to/repo" })
+        .WithExample(new[] { "interactive", "." })
+        .WithExample(new[] { "i", "--verbose" });
+
     config.UseStrictParsing();
     config.ValidateExamples();
 });

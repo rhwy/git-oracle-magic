@@ -17,7 +17,10 @@
         <PublishReadyToRun>true</PublishReadyToRun>
         <PublishTrimmed>false</PublishTrimmed>
 
-        <!-- Tool information  ~/.bin/gitoraclemagic/GitOracleMagic -->
+        <!-- Output executable name -->
+        <AssemblyName>gom</AssemblyName>
+        
+        <!-- Tool information -->
         <AssemblyTitle>Git Oracle Magic</AssemblyTitle>
         <AssemblyDescription>A powerful CLI tool for analyzing Git repositories</AssemblyDescription>
         <AssemblyVersion>1.0.0</AssemblyVersion>

@@ -23,6 +23,13 @@ A powerful .NET CLI tool for analyzing Git repositories to uncover insights abou
 - Top contributor filtering with color-coded legend
 - Rich visualization using Spectre.Console colors
 - Activity pattern analysis and peak identification
+
+### 🎮 Interactive Mode (`interactive` command)
+- User-friendly guided interface with menus
+- Step-by-step parameter configuration
+- All commands available through interactive prompts
+- Perfect for exploring repository insights
+- Clean, intuitive navigation with quit option
 - Comprehensive contributor statistics
 - Commit counts and activity periods
 - Lines added, deleted, and total changes
@@ -32,18 +39,64 @@ A powerful .NET CLI tool for analyzing Git repositories to uncover insights abou
 ## Installation
 
 ### Prerequisites
-- .NET 8.0 or later
+- .NET 8.0 or later (for building)
 - Git repository to analyze
 
-### Build from Source
+### Building Single-File Executable
+
+Choose your platform and run the appropriate command:
+
 ```bash
-git clone <repository-url>
-cd GitOracleMagic
-dotnet restore
-dotnet build
+# macOS (Apple Silicon)
+dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish
+
+# macOS (Intel)
+dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+
+# Linux (x64)
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+
+# Windows (x64)
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+```
+
+The executable will be created as `./dist/gom` (or `gom.exe` on Windows). Copy it to your PATH for global access:
+
+```bash
+# macOS/Linux
+sudo cp ./dist/gom /usr/local/bin/
+# or to user bin
+cp ./dist/gom ~/bin/
+
+# Windows
+copy dist\gom.exe C:\Windows\System32\
+# or add dist folder to PATH
 ```
 
 ## Usage
+
+### 🎮 Interactive Mode (Recommended)
+The easiest way to use Git Oracle Magic:
+
+```bash
+# Interactive mode in current directory
+gom -i
+
+# Interactive mode for specific repository
+gom -i /path/to/your/repo
+
+# Alternative syntax
+gom interactive .
+gom interactive /path/to/repo
+```
+
+The interactive mode provides:
+- ✨ Beautiful guided menus
+- 🔧 Step-by-step parameter configuration
+- 📋 All commands available with explanations
+- ❌ Easy quit option to exit
+
+### 📟 Direct Command Usage
 
 ### File Analysis
 Analyze the most changed files in a repository:
@@ -97,6 +150,25 @@ dotnet run -- timeline --path /path/to/repo --period monthly
 
 # Short form with verbose logging
 dotnet run -- timeline -p /path/to/repo --period w -t 20 -s 2023-06-01 -v
+```
+
+### After Installation
+Once the `gom` executable is in your PATH:
+
+```bash
+# Interactive mode (easiest)
+gom -i                    # Current directory
+gom -i /path/to/repo      # Specific repository
+
+# Direct commands
+gom analyze --top 20
+gom contributors --top 15  
+gom coupling --since 2023-01-01
+gom timeline --period weekly
+
+# Get help
+gom --help
+gom analyze --help
 ```
 - `-p, --path <path>`: Path to the Git repository (default: current directory)
 - `-t, --top <number>`: Number of top coupled file pairs to display (default: 15)
