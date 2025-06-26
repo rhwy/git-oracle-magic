@@ -1,8 +1,8 @@
 ﻿// Program.cs
 
 using GitOracleMagic.Commands;
-using GitOracleMagic.Infrastructure;
 using GitOracleMagic.Services;
+using GitOracleMagic.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -48,6 +48,8 @@ services.AddTransient<IGitRepositoryAnalyzer, GitRepositoryAnalyzer>();
 services.AddTransient<IReportGenerator, ConsoleReportGenerator>();
 services.AddTransient<IContributorAnalyzer, ContributorAnalyzer>();
 services.AddTransient<IContributorReportGenerator, ContributorReportGenerator>();
+services.AddTransient<IChangeCouplingAnalyzer, ChangeCouplingAnalyzer>();
+services.AddTransient<ICouplingReportGenerator, CouplingReportGenerator>();
 
 // Create the command app
 var app = new CommandApp(new TypeRegistrar(services));
@@ -66,6 +68,12 @@ app.Configure(config =>
         .WithDescription("Analyze Git repository contributors and their statistics")
         .WithExample(new[] { "contributors", "--path", "/path/to/repo", "--top", "15" })
         .WithExample(new[] { "contributors", "-p", ".", "-t", "20", "--verbose" });
+
+    config.AddCommand<CouplingCommand>("coupling")
+        .WithDescription("Analyze change coupling between files (files that change together)")
+        .WithExample(new[] { "coupling", "--path", "/path/to/repo", "--top", "20" })
+        .WithExample(new[] { "coupling", "-p", ".", "-t", "15", "--since", "2023-01-01" })
+        .WithExample(new[] { "coupling", "--min-strength", "0.3", "--verbose" });
 
     config.UseStrictParsing();
     config.ValidateExamples();

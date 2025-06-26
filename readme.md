@@ -10,7 +10,12 @@ A powerful .NET CLI tool for analyzing Git repositories to uncover insights abou
 - Identify top 3 contributors for each file
 - Beautiful tabular output with color-coded metrics
 
-### 👥 Contributor Analysis (`contributors` command)
+### 🔗 Change Coupling Analysis (`coupling` command)
+- Identify files that frequently change together
+- Coupling strength analysis with percentage metrics
+- Configurable time periods and minimum coupling thresholds
+- Most frequently changed files overview
+- Architectural insights for refactoring decisions
 - Comprehensive contributor statistics
 - Commit counts and activity periods
 - Lines added, deleted, and total changes
@@ -67,7 +72,13 @@ dotnet run -- contributors --path /path/to/repo --top 15
 dotnet run -- contributors -p /path/to/repo -t 20 -v
 ```
 
-### Global Options
+### Change Coupling Options
+- `-p, --path <path>`: Path to the Git repository (default: current directory)
+- `-t, --top <number>`: Number of top coupled file pairs to display (default: 15)
+- `-s, --since <date>`: Only analyze commits since this date (YYYY-MM-DD format)
+- `-m, --min-strength <value>`: Minimum coupling strength percentage (0.0-1.0, default: 0.1)
+- `-v, --verbose`: Enable verbose logging to console
+- `-h, --help`: Show help information
 - `-p, --path <path>`: Path to the Git repository (default: current directory)
 - `-t, --top <number>`: Number of top results to display (default: 10)
 - `-v, --verbose`: Enable verbose logging to console (logs always written to file)
@@ -94,7 +105,26 @@ dotnet run -- contributors -p /path/to/repo -t 20 -v
 ╰──────┴─────────────────────────┴─────────┴──────────────┴──────────────┴─────────────────────╯
 ```
 
-### Contributors Analysis
+### Change Coupling Analysis
+```
+── Change Coupling Analysis Report ────────────────────────────────────────────────
+
+╭─Analysis Information───────────────────────────╮
+│ Repository: /Users/username/project            │
+│ Analysis Date: 2025-06-26 01:25:42             │
+│ Analysis Period: Since: 2023-01-01             │
+│ Commits Analyzed: 847                          │
+│ Files Analyzed: 234                            │
+│ Min Coupling Strength: 10.0%                   │
+╰────────────────────────────────────────────────╯
+
+╭──────┬─────────────────────────┬─────────────────────────┬─────────────────┬─────────────────────┬─────────────────────╮
+│ Rank │ File 1                  │ File 2                  │ Coupled Changes │ Coupling Strength   │ Last Shared Change  │
+├──────┼─────────────────────────┼─────────────────────────┼─────────────────┼─────────────────────┼─────────────────────┤
+│ 1    │ src/components/user.ts  │ src/types/user.ts       │ 23              │ 85.2%               │ 2025-06-20          │
+│ 2    │ src/api/auth.ts         │ src/middleware/auth.ts  │ 18              │ 72.0%               │ 2025-06-15          │
+╰──────┴─────────────────────────┴─────────────────────────┴─────────────────┴─────────────────────┴─────────────────────╯
+```
 ```
 ╭─Repository Information─────────────────────────╮
 │ Repository: /Users/username/project            │
