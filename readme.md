@@ -16,6 +16,13 @@ A powerful .NET CLI tool for analyzing Git repositories to uncover insights abou
 - Configurable time periods and minimum coupling thresholds
 - Most frequently changed files overview
 - Architectural insights for refactoring decisions
+
+### 📈 Timeline Visualization (`timeline` command)
+- Visual commit timeline with colored bars showing contributor proportions
+- Multiple time periods: daily, weekly, monthly
+- Top contributor filtering with color-coded legend
+- Rich visualization using Spectre.Console colors
+- Activity pattern analysis and peak identification
 - Comprehensive contributor statistics
 - Commit counts and activity periods
 - Lines added, deleted, and total changes
@@ -72,7 +79,25 @@ dotnet run -- contributors --path /path/to/repo --top 15
 dotnet run -- contributors -p /path/to/repo -t 20 -v
 ```
 
-### Change Coupling Options
+### Timeline Visualization
+Show commit activity over time with beautiful contributor visualizations:
+
+```bash
+# Monthly timeline (default: top 10 contributors)
+dotnet run -- timeline
+
+# Weekly timeline with more contributors
+dotnet run -- timeline --period weekly --top 15
+
+# Daily timeline for recent activity
+dotnet run -- timeline --period daily --since 2024-01-01
+
+# Analyze specific repository
+dotnet run -- timeline --path /path/to/repo --period monthly
+
+# Short form with verbose logging
+dotnet run -- timeline -p /path/to/repo --period w -t 20 -s 2023-06-01 -v
+```
 - `-p, --path <path>`: Path to the Git repository (default: current directory)
 - `-t, --top <number>`: Number of top coupled file pairs to display (default: 15)
 - `-s, --since <date>`: Only analyze commits since this date (YYYY-MM-DD format)

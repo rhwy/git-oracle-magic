@@ -1,8 +1,7 @@
 ﻿// Program.cs
-
 using GitOracleMagic.Commands;
-using GitOracleMagic.Services;
 using GitOracleMagic.Infrastructure;
+using GitOracleMagic.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -50,6 +49,8 @@ services.AddTransient<IContributorAnalyzer, ContributorAnalyzer>();
 services.AddTransient<IContributorReportGenerator, ContributorReportGenerator>();
 services.AddTransient<IChangeCouplingAnalyzer, ChangeCouplingAnalyzer>();
 services.AddTransient<ICouplingReportGenerator, CouplingReportGenerator>();
+services.AddTransient<ITimelineAnalyzer, TimelineAnalyzer>();
+services.AddTransient<ITimelineReportGenerator, TimelineReportGenerator>();
 
 // Create the command app
 var app = new CommandApp(new TypeRegistrar(services));
@@ -74,6 +75,12 @@ app.Configure(config =>
         .WithExample(new[] { "coupling", "--path", "/path/to/repo", "--top", "20" })
         .WithExample(new[] { "coupling", "-p", ".", "-t", "15", "--since", "2023-01-01" })
         .WithExample(new[] { "coupling", "--min-strength", "0.3", "--verbose" });
+
+    config.AddCommand<TimelineCommand>("timeline")
+        .WithDescription("Show commit timeline with contributor activity visualization")
+        .WithExample(new[] { "timeline", "--path", "/path/to/repo", "--period", "monthly" })
+        .WithExample(new[] { "timeline", "-p", ".", "--period", "weekly", "--top", "15" })
+        .WithExample(new[] { "timeline", "--since", "2023-01-01", "--period", "daily", "--verbose" });
 
     config.UseStrictParsing();
     config.ValidateExamples();

@@ -9,6 +9,19 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <NoWarn>$(NoWarn);IL2067;IL3050</NoWarn>
+
+        <!-- Single-file publishing configuration -->
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishTrimmed>false</PublishTrimmed>
+
+        <!-- Tool information  ~/.bin/gitoraclemagic/GitOracleMagic -->
+        <AssemblyTitle>Git Oracle Magic</AssemblyTitle>
+        <AssemblyDescription>A powerful CLI tool for analyzing Git repositories</AssemblyDescription>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
