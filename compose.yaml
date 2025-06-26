@@ -1,0 +1,7 @@
+﻿services:
+  gitoraclemagic:
+    image: gitoraclemagic
+    build:
+      context: .
+      dockerfile: GitOracleMagic/Dockerfile
+
