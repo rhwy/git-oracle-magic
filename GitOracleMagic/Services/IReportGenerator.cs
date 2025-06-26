@@ -1,7 +1,8 @@
 // Services/IReportGenerator.cs
-using GitRepoAnalyzer.Models;
 
-namespace GitRepoAnalyzer.Services
+using GitOracleMagic.Models;
+
+namespace GitOracleMagic.Services
 {
     public interface IReportGenerator
     {

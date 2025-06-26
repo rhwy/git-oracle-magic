@@ -1,10 +1,11 @@
 // Commands/AnalyzeCommand.cs
-using GitRepoAnalyzer.Services;
+
+using GitOracleMagic.Services;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace GitRepoAnalyzer.Commands
+namespace GitOracleMagic.Commands
 {
     public class AnalyzeCommand : AsyncCommand<AnalyzeSettings>
     {

@@ -1,7 +1,8 @@
 ﻿// Program.cs
-using GitRepoAnalyzer.Commands;
-using GitRepoAnalyzer.Infrastructure;
-using GitRepoAnalyzer.Services;
+
+using GitOracleMagic.Commands;
+using GitOracleMagic.Infrastructure;
+using GitOracleMagic.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;

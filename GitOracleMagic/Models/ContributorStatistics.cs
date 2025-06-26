@@ -1,5 +1,5 @@
 // Models/ContributorStatistics.cs
-namespace GitRepoAnalyzer.Models
+namespace GitOracleMagic.Models
 {
     public class ContributorStatistics
     {

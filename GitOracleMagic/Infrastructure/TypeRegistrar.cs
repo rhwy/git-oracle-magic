@@ -1,8 +1,9 @@
 // Infrastructure/TypeRegistrar.cs
+
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
-namespace GitRepoAnalyzer.Infrastructure
+namespace GitOracleMagic.Infrastructure
 {
     public sealed class TypeRegistrar : ITypeRegistrar
     {

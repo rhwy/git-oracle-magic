@@ -1,9 +1,10 @@
 // Services/GitRepositoryAnalyzer.cs
-using GitRepoAnalyzer.Models;
+
+using GitOracleMagic.Models;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 
-namespace GitRepoAnalyzer.Services
+namespace GitOracleMagic.Services
 {
     public class GitRepositoryAnalyzer : IGitRepositoryAnalyzer
     {

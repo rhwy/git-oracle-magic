@@ -1,5 +1,5 @@
 // Models/FileStatistics.cs
-namespace GitRepoAnalyzer.Models
+namespace GitOracleMagic.Models
 {
     public class FileStatistics
     {

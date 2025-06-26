@@ -1,9 +1,10 @@
 // Services/ContributorReportGenerator.cs
-using GitRepoAnalyzer.Models;
+
+using GitOracleMagic.Models;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
-namespace GitRepoAnalyzer.Services
+namespace GitOracleMagic.Services
 {
     public class ContributorReportGenerator : IContributorReportGenerator
     {

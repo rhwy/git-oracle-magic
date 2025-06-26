@@ -1,8 +1,9 @@
 // Commands/AnalyzeSettings.cs
-using Spectre.Console.Cli;
-using System.ComponentModel;
 
-namespace GitRepoAnalyzer.Commands
+using System.ComponentModel;
+using Spectre.Console.Cli;
+
+namespace GitOracleMagic.Commands
 {
     public class AnalyzeSettings : CommandSettings
     {
