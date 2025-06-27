@@ -30,6 +30,14 @@ A powerful .NET CLI tool for analyzing Git repositories to uncover insights abou
 - All commands available through interactive prompts
 - Perfect for exploring repository insights
 - Clean, intuitive navigation with quit option
+
+### 📋 HTML Export (`export` command)
+- Comprehensive HTML report combining all analyses
+- Beautiful, professional styling with gradients and responsive design
+- Executive summary with key metrics
+- All analysis tables with color-coded data
+- Timeline visualization with activity bars
+- Shareable reports for teams and stakeholders
 - Comprehensive contributor statistics
 - Commit counts and activity periods
 - Lines added, deleted, and total changes
@@ -48,16 +56,16 @@ Choose your platform and run the appropriate command:
 
 ```bash
 # macOS (Apple Silicon)
-dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish
+dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./dist
 
 # macOS (Intel)
-dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./dist
 
 # Linux (x64)
-dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist
 
 # Windows (x64)
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist
 ```
 
 The executable will be created as `./dist/gom` (or `gom.exe` on Windows). Copy it to your PATH for global access:

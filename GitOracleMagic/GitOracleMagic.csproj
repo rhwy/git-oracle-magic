@@ -45,4 +45,10 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Templates\report_template.html" />
+      <EmbeddedResource Include="Templates\report_template.html" />
+    </ItemGroup>
+
+    
 </Project>

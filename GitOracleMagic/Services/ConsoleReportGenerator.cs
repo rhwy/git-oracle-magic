@@ -77,8 +77,8 @@ namespace GitOracleMagic.Services
                     $"[bold]{rank}[/]",
                     $"[blue]{EscapeMarkup(TruncatePath(stats.Path, 50))}[/]",
                     $"[{changeCountColor}]{stats.ChangeCount}[/]",
-                    $"[dim]{stats.FirstChange.Date:yyyy-MM-dd}[/]\n[grey]{EscapeMarkup(stats.FirstChange.AuthorName)}[/]",
                     $"[dim]{stats.LastChange.Date:yyyy-MM-dd}[/]\n[grey]{EscapeMarkup(stats.LastChange.AuthorName)}[/]",
+                    $"[dim]{stats.FirstChange.Date:yyyy-MM-dd}[/]\n[grey]{EscapeMarkup(stats.FirstChange.AuthorName)}[/]",
                     contributorsText
                 );
 

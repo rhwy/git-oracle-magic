@@ -101,6 +101,8 @@ namespace GitOracleMagic.Services
                 _logger.LogInformation("Processed a total of {CommitCount} commits", commitCount);
                 _logger.LogInformation("Found {FileCount} files with changes", fileStats.Count);
 
+                var totalFilesCount = fileStats.Count;
+                
                 // Convert to model and sort by change count
                 var topChangedFiles = fileStats
                     .Select(kvp => new FileStatistics
@@ -134,9 +136,10 @@ namespace GitOracleMagic.Services
                     .ToList();
 
                 result.Files = topChangedFiles;
+                result.TotalFilesAnalyzed = totalFilesCount;
             });
 
             return result;
-        }
+        } 
     }
 }

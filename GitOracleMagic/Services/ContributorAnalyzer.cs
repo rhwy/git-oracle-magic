@@ -1,5 +1,4 @@
 // Services/ContributorAnalyzer.cs
-
 using GitOracleMagic.Models;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
@@ -65,9 +64,12 @@ namespace GitOracleMagic.Services
                     
                     // Update basic stats
                     stats.CommitCount++;
-                    stats.LastCommit = commit.Author.When.DateTime;
                     
-                    // Update first commit if this is earlier
+                    // Update date ranges (commits are processed in reverse chronological order)
+                    if (commit.Author.When.DateTime > stats.LastCommit)
+                    {
+                        stats.LastCommit = commit.Author.When.DateTime;
+                    }
                     if (commit.Author.When.DateTime < stats.FirstCommit)
                     {
                         stats.FirstCommit = commit.Author.When.DateTime;

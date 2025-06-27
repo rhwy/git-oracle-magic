@@ -51,6 +51,8 @@ services.AddTransient<IChangeCouplingAnalyzer, ChangeCouplingAnalyzer>();
 services.AddTransient<ICouplingReportGenerator, CouplingReportGenerator>();
 services.AddTransient<ITimelineAnalyzer, TimelineAnalyzer>();
 services.AddTransient<ITimelineReportGenerator, TimelineReportGenerator>();
+services.AddTransient<IComprehensiveAnalyzer, ComprehensiveAnalyzer>();
+services.AddTransient<IHtmlReportGenerator, HtmlReportGenerator>();
 
 // Create the command app
 var app = new CommandApp(new TypeRegistrar(services));
@@ -88,6 +90,12 @@ app.Configure(config =>
         .WithExample(new[] { "interactive", "/path/to/repo" })
         .WithExample(new[] { "interactive", "." })
         .WithExample(new[] { "i", "--verbose" });
+
+    config.AddCommand<ExportCommand>("export")
+        .WithDescription("Generate comprehensive HTML report with all analyses")
+        .WithExample(new[] { "export", "--path", "/path/to/repo" })
+        .WithExample(new[] { "export", "-p", ".", "--since", "2023-01-01" })
+        .WithExample(new[] { "export", "--output", "my-report.html", "--no-open" });
 
     config.UseStrictParsing();
     config.ValidateExamples();

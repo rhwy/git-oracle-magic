@@ -28,5 +28,6 @@ namespace GitOracleMagic.Models
         public string RepositoryPath { get; set; } = string.Empty;
         public List<FileStatistics> Files { get; set; } = new();
         public DateTime AnalysisTime { get; set; } = DateTime.Now;
+        public int TotalFilesAnalyzed { get; set; } 
     }
 }

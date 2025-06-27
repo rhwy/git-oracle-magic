@@ -17,6 +17,8 @@ namespace GitOracleMagic.Commands
         private readonly ICouplingReportGenerator _couplingReportGenerator;
         private readonly ITimelineAnalyzer _timelineAnalyzer;
         private readonly ITimelineReportGenerator _timelineReportGenerator;
+        private readonly IComprehensiveAnalyzer _comprehensiveAnalyzer;
+        private readonly IHtmlReportGenerator _htmlReportGenerator;
         private readonly ILogger<InteractiveCommand> _logger;
 
         public InteractiveCommand(
@@ -28,6 +30,8 @@ namespace GitOracleMagic.Commands
             ICouplingReportGenerator couplingReportGenerator,
             ITimelineAnalyzer timelineAnalyzer,
             ITimelineReportGenerator timelineReportGenerator,
+            IComprehensiveAnalyzer comprehensiveAnalyzer,
+            IHtmlReportGenerator htmlReportGenerator,
             ILogger<InteractiveCommand> logger)
         {
             _gitAnalyzer = gitAnalyzer;
@@ -38,6 +42,8 @@ namespace GitOracleMagic.Commands
             _couplingReportGenerator = couplingReportGenerator;
             _timelineAnalyzer = timelineAnalyzer;
             _timelineReportGenerator = timelineReportGenerator;
+            _comprehensiveAnalyzer = comprehensiveAnalyzer;
+            _htmlReportGenerator = htmlReportGenerator;
             _logger = logger;
         }
 
@@ -108,7 +114,6 @@ namespace GitOracleMagic.Commands
             AnsiConsole.WriteLine();
             
             var panel = new Panel($"[bold]Interactive Mode[/]\n[blue]Repository:[/] {repoPath}")
-                //.Border(TableBorder.Rounded)
                 .BorderColor(Color.Blue)
                 .Padding(1, 0);
             
@@ -125,7 +130,7 @@ namespace GitOracleMagic.Commands
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices(new[]
                     {
-                        "analyze", "contributors", "coupling", "timeline", "quit"
+                        "analyze", "contributors", "coupling", "timeline", "export", "quit"
                     })
                     .UseConverter(choice => choice switch
                     {
@@ -133,6 +138,7 @@ namespace GitOracleMagic.Commands
                         "contributors" => "👥 Contributors Analysis - Top contributors statistics", 
                         "coupling" => "🔗 Change Coupling - Files that change together",
                         "timeline" => "📈 Timeline Visualization - Commit activity over time",
+                        "export" => "📋 Export HTML Report - Comprehensive analysis report",
                         "quit" => "❌ Quit - Exit Git Oracle Magic",
                         _ => choice
                     }));
@@ -155,6 +161,9 @@ namespace GitOracleMagic.Commands
                     break;
                 case "timeline":
                     await ExecuteTimelineCommand(repoPath, verbose);
+                    break;
+                case "export":
+                    await ExecuteExportCommand(repoPath, verbose);
                     break;
             }
         }
@@ -295,6 +304,101 @@ namespace GitOracleMagic.Commands
                 });
 
             _timelineReportGenerator.GenerateReport(result);
+        }
+
+        private async Task ExecuteExportCommand(string repoPath, bool verbose)
+        {
+            AnsiConsole.MarkupLine("[yellow]📋 HTML Export Configuration[/]\n");
+
+            var sinceDate = AnsiConsole.Prompt(
+                new TextPrompt<string>("[blue]Analyze commits since date (YYYY-MM-DD, or press Enter for repository start):[/]")
+                    .DefaultValue("")
+                    .AllowEmpty()
+                    .Validate(date =>
+                    {
+                        if (string.IsNullOrWhiteSpace(date)) return ValidationResult.Success();
+                        return DateTime.TryParse(date, out _) ? ValidationResult.Success() : ValidationResult.Error("[red]Invalid date format. Use YYYY-MM-DD[/]");
+                    }));
+
+            var outputPath = AnsiConsole.Prompt(
+                new TextPrompt<string>("[blue]Output file path (or press Enter for auto-generated name):[/]")
+                    .DefaultValue("")
+                    .AllowEmpty());
+
+            var autoOpen = AnsiConsole.Confirm("[blue]Open report in browser after generation?[/]", true);
+
+            AnsiConsole.WriteLine();
+
+            var sinceDateParsed = string.IsNullOrWhiteSpace(sinceDate) ? DateTime.MinValue : DateTime.Parse(sinceDate);
+            var finalOutputPath = string.IsNullOrWhiteSpace(outputPath) 
+                ? $"git-oracle-report-{Path.GetFileName(Path.GetFullPath(repoPath))}-{DateTime.Now:yyyyMMdd-HHmmss}.html"
+                : outputPath;
+
+            var config = new ExportConfiguration
+            {
+                SinceDate = sinceDateParsed == DateTime.MinValue ? null : sinceDateParsed,
+                UntilDate = null,
+                OutputPath = finalOutputPath,
+                OpenAfterExport = autoOpen,
+                TopFiles = 20,
+                TopContributors = 20,
+                TopCouples = 20,
+                MinCouplingStrength = 0.1,
+                TimelinePeriod = TimePeriod.Monthly,
+                TimelineContributors = 20
+            };
+
+            var reportData = await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    var task = ctx.AddTask("[green]Generating comprehensive report...[/]");
+                    task.IsIndeterminate = true;
+                    
+                    return await _comprehensiveAnalyzer.GenerateComprehensiveReportAsync(repoPath, config);
+                });
+
+            var htmlPath = await _htmlReportGenerator.GenerateHtmlReportAsync(reportData, finalOutputPath);
+
+            var successPanel = new Panel($"""
+                [bold green]✅ HTML Report Generated![/]
+                
+                [bold]File:[/] [blue]{htmlPath}[/]
+                [bold]Repository:[/] [dim]{reportData.RepositoryName}[/]
+                """)
+                .Header(" Export Complete ")
+                .BorderColor(Color.Green);
+
+            AnsiConsole.Write(successPanel);
+
+            if (autoOpen)
+            {
+                AnsiConsole.MarkupLine("\n[dim]Opening report in default browser...[/]");
+                await OpenFileAsync(htmlPath);
+            }
+        }
+
+        private static async Task OpenFileAsync(string filePath)
+        {
+            try
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(filePath) { UseShellExecute = true });
+                }
+                else if (OperatingSystem.IsMacOS())
+                {
+                    System.Diagnostics.Process.Start("open", filePath);
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    System.Diagnostics.Process.Start("xdg-open", filePath);
+                }
+                await Task.CompletedTask;
+            }
+            catch (Exception)
+            {
+                // Silently fail if we can't open the file
+            }
         }
     }
 }
