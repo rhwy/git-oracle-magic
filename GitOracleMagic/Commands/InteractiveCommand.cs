@@ -19,6 +19,8 @@ namespace GitOracleMagic.Commands
         private readonly ITimelineReportGenerator _timelineReportGenerator;
         private readonly IComprehensiveAnalyzer _comprehensiveAnalyzer;
         private readonly IHtmlReportGenerator _htmlReportGenerator;
+        private readonly ICodeMetricsAnalyzer _codeMetricsAnalyzer;
+        private readonly ICodeMetricsReportGenerator _codeMetricsReportGenerator;
         private readonly ILogger<InteractiveCommand> _logger;
 
         public InteractiveCommand(
@@ -32,6 +34,8 @@ namespace GitOracleMagic.Commands
             ITimelineReportGenerator timelineReportGenerator,
             IComprehensiveAnalyzer comprehensiveAnalyzer,
             IHtmlReportGenerator htmlReportGenerator,
+            ICodeMetricsAnalyzer codeMetricsAnalyzer,
+            ICodeMetricsReportGenerator codeMetricsReportGenerator,
             ILogger<InteractiveCommand> logger)
         {
             _gitAnalyzer = gitAnalyzer;
@@ -44,6 +48,8 @@ namespace GitOracleMagic.Commands
             _timelineReportGenerator = timelineReportGenerator;
             _comprehensiveAnalyzer = comprehensiveAnalyzer;
             _htmlReportGenerator = htmlReportGenerator;
+            _codeMetricsAnalyzer = codeMetricsAnalyzer;
+            _codeMetricsReportGenerator = codeMetricsReportGenerator;
             _logger = logger;
         }
 
@@ -130,7 +136,7 @@ namespace GitOracleMagic.Commands
                     .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
                     .AddChoices(new[]
                     {
-                        "analyze", "contributors", "coupling", "timeline", "export", "quit"
+                        "analyze", "contributors", "coupling", "timeline", "metrics", "export", "quit"
                     })
                     .UseConverter(choice => choice switch
                     {
@@ -138,6 +144,7 @@ namespace GitOracleMagic.Commands
                         "contributors" => "👥 Contributors Analysis - Top contributors statistics", 
                         "coupling" => "🔗 Change Coupling - Files that change together",
                         "timeline" => "📈 Timeline Visualization - Commit activity over time",
+                        "metrics" => "🔧 Code Metrics - Complexity and maintainability analysis",
                         "export" => "📋 Export HTML Report - Comprehensive analysis report",
                         "quit" => "❌ Quit - Exit Git Oracle Magic",
                         _ => choice
@@ -161,6 +168,9 @@ namespace GitOracleMagic.Commands
                     break;
                 case "timeline":
                     await ExecuteTimelineCommand(repoPath, verbose);
+                    break;
+                case "metrics":
+                    await ExecuteMetricsCommand(repoPath, verbose);
                     break;
                 case "export":
                     await ExecuteExportCommand(repoPath, verbose);
@@ -306,6 +316,53 @@ namespace GitOracleMagic.Commands
             _timelineReportGenerator.GenerateReport(result);
         }
 
+        private async Task ExecuteMetricsCommand(string repoPath, bool verbose)
+        {
+            AnsiConsole.MarkupLine("[yellow]🔧 Code Metrics Configuration[/]\n");
+
+            var topFiles = AnsiConsole.Prompt(
+                new TextPrompt<int>("[blue]Number of top complex files to display:[/]")
+                    .DefaultValue(20)
+                    .ValidationErrorMessage("[red]Please enter a valid number[/]")
+                    .Validate(n => n > 0 ? ValidationResult.Success() : ValidationResult.Error("[red]Number must be greater than 0[/]")));
+
+            var extensions = AnsiConsole.Prompt(
+                new TextPrompt<string>("[blue]File extensions to analyze (comma-separated):[/]")
+                    .DefaultValue(".cs,.vb")
+                    .AllowEmpty());
+
+            var excludePatterns = AnsiConsole.Prompt(
+                new TextPrompt<string>("[blue]Patterns to exclude (comma-separated):[/]")
+                    .DefaultValue("bin,obj,packages,.git,node_modules")
+                    .AllowEmpty());
+
+            AnsiConsole.WriteLine();
+
+            var config = new CodeMetricsConfiguration
+            {
+                TopComplexFiles = topFiles,
+                FileExtensions = extensions.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(ext => ext.Trim()).ToList(),
+                ExcludePatterns = excludePatterns.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(pattern => pattern.Trim()).ToList()
+            };
+
+            var result = await AnsiConsole.Progress()
+                .StartAsync(async ctx =>
+                {
+                    var task = ctx.AddTask("[green]Analyzing code metrics...[/]");
+                    task.IsIndeterminate = true;
+                    
+                    return await _codeMetricsAnalyzer.AnalyzeCodeMetricsAsync(repoPath, config);
+                });
+
+            if (!result.AnalysisSuccessful)
+            {
+                AnsiConsole.MarkupLine($"[red]❌ Analysis failed: {result.ErrorMessage}[/]");
+                return;
+            }
+
+            _codeMetricsReportGenerator.GenerateReport(result, topFiles);
+        }
+
         private async Task ExecuteExportCommand(string repoPath, bool verbose)
         {
             AnsiConsole.MarkupLine("[yellow]📋 HTML Export Configuration[/]\n");
@@ -325,6 +382,11 @@ namespace GitOracleMagic.Commands
                     .DefaultValue("")
                     .AllowEmpty());
 
+            var templatePath = AnsiConsole.Prompt(
+                new TextPrompt<string>("[blue]Custom HTML template path (or press Enter for default template):[/]")
+                    .DefaultValue("")
+                    .AllowEmpty());
+
             var autoOpen = AnsiConsole.Confirm("[blue]Open report in browser after generation?[/]", true);
 
             AnsiConsole.WriteLine();
@@ -336,7 +398,7 @@ namespace GitOracleMagic.Commands
 
             var config = new ExportConfiguration
             {
-                SinceDate = sinceDateParsed == DateTime.MinValue ? null : sinceDateParsed,
+                SinceDate = sinceDateParsed,
                 UntilDate = null,
                 OutputPath = finalOutputPath,
                 OpenAfterExport = autoOpen,
@@ -357,7 +419,8 @@ namespace GitOracleMagic.Commands
                     return await _comprehensiveAnalyzer.GenerateComprehensiveReportAsync(repoPath, config);
                 });
 
-            var htmlPath = await _htmlReportGenerator.GenerateHtmlReportAsync(reportData, finalOutputPath);
+            var htmlPath = await _htmlReportGenerator.GenerateHtmlReportAsync(reportData, finalOutputPath, 
+                string.IsNullOrWhiteSpace(templatePath) ? null : templatePath);
 
             var successPanel = new Panel($"""
                 [bold green]✅ HTML Report Generated![/]
@@ -366,7 +429,8 @@ namespace GitOracleMagic.Commands
                 [bold]Repository:[/] [dim]{reportData.RepositoryName}[/]
                 """)
                 .Header(" Export Complete ")
-                .BorderColor(Color.Green);
+                .BorderColor(Color.Green)
+                .RoundedBorder();
 
             AnsiConsole.Write(successPanel);
 

@@ -53,6 +53,8 @@ services.AddTransient<ITimelineAnalyzer, TimelineAnalyzer>();
 services.AddTransient<ITimelineReportGenerator, TimelineReportGenerator>();
 services.AddTransient<IComprehensiveAnalyzer, ComprehensiveAnalyzer>();
 services.AddTransient<IHtmlReportGenerator, HtmlReportGenerator>();
+services.AddTransient<ICodeMetricsAnalyzer, RoslynCodeMetricsAnalyzer>();
+services.AddTransient<ICodeMetricsReportGenerator, CodeMetricsReportGenerator>();
 
 // Create the command app
 var app = new CommandApp(new TypeRegistrar(services));
@@ -96,6 +98,12 @@ app.Configure(config =>
         .WithExample(new[] { "export", "--path", "/path/to/repo" })
         .WithExample(new[] { "export", "-p", ".", "--since", "2023-01-01" })
         .WithExample(new[] { "export", "--output", "my-report.html", "--no-open" });
+
+    config.AddCommand<MetricsCommand>("metrics")
+        .WithDescription("Analyze code metrics (complexity, maintainability) for .NET code")
+        .WithExample(new[] { "metrics", "--path", "/path/to/repo" })
+        .WithExample(new[] { "metrics", "-p", ".", "--top", "30" })
+        .WithExample(new[] { "metrics", "--extensions", ".cs,.vb", "--exclude", "bin,obj" });
 
     config.UseStrictParsing();
     config.ValidateExamples();

@@ -43,8 +43,12 @@
         <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.8.0" />
     </ItemGroup>
 
+    
     <ItemGroup>
       <None Remove="Templates\report_template.html" />
       <EmbeddedResource Include="Templates\report_template.html" />

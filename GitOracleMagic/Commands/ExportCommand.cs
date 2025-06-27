@@ -106,7 +106,7 @@ namespace GitOracleMagic.Commands
                     });
 
                 // Generate HTML report
-                var htmlPath = await _htmlGenerator.GenerateHtmlReportAsync(reportData, outputPath);
+                var htmlPath = await _htmlGenerator.GenerateHtmlReportAsync(reportData, outputPath, settings.HtmlTemplatePath);
 
                 // Show success message
                 var successPanel = new Panel($"""

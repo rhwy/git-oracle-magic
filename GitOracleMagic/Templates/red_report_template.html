@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Oracle Magic Report - {{REPOSITORY_NAME}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Fidelidade actual color palette from their website */
+        :root {
+            --primary-red: #e60012;
+            --primary-dark-red: #cc0010;
+            --secondary-blue: #003366;
+            --accent-gray: #666666;
+            --light-gray: #f5f5f5;
+            --medium-gray: #999999;
+            --dark-gray: #333333;
+            --white: #ffffff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--white);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+
+        /* Header with Fidelidade's actual red branding */
+        .header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-dark-red) 100%);
+            color: var(--white);
+            padding: 40px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            transform: translate(-75px, 75px);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 300;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .header .logo-section {
+            position: absolute;
+            top: 20px;
+            right: 60px;
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation with modern card design */
+        .nav-container {
+            background: var(--white);
+            padding: 0 60px;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+            gap: 40px;
+        }
+
+        .nav a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.95em;
+        }
+
+        .nav a:hover {
+            background: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Content sections with card-based design */
+        .content {
+            padding: 40px 60px;
+        }
+
+        .section {
+            background: var(--white);
+            margin-bottom: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--light-gray) 0%, #e9ecef 100%);
+            padding: 25px 30px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .section-header h2 {
+            color: var(--primary-red);
+            font-size: 1.6em;
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-body {
+            padding: 30px;
+        }
+
+        /* Summary cards with Fidelidade-style metrics */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-red);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(230,0,18,0.15);
+            border-color: var(--primary-red);
+        }
+
+        .summary-card .number {
+            font-size: 2.2em;
+            font-weight: 600;
+            color: var(--primary-red);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .label {
+            color: var(--medium-gray);
+            font-weight: 500;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tables with modern Fidelidade styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            font-size: 0.9em;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-dark-red) 100%);
+            color: var(--white);
+            padding: 18px 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background: #fdfdfd;
+        }
+
+        tr:nth-child(even):hover {
+            background: #f8f9fa;
+        }
+
+        th:last-child, td:last-child {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+
+        th:not(:last-child), td:not(:last-child) {
+            white-space: nowrap;
+        }
+
+        /* Metrics styling */
+        .rank {
+            font-weight: 700;
+            color: var(--primary-red);
+            text-align: center;
+            width: 60px;
+            font-size: 1.1em;
+        }
+
+        .metric {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .metric.high { color: var(--danger); }
+        .metric.medium { color: var(--accent-orange); }
+        .metric.low { color: var(--success); }
+
+        /* File links with Fidelidade styling */
+        .file-link {
+            color: var(--secondary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted var(--secondary-blue);
+            transition: all 0.3s ease;
+            padding: 2px 0;
+        }
+
+        .file-link:hover {
+            color: var(--primary-red);
+            border-bottom: 2px solid var(--primary-red);
+            background: rgba(230,0,18,0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 0 -8px;
+        }
+
+        /* Timeline bars */
+        .timeline-bar {
+            height: 24px;
+            background: linear-gradient(90deg, var(--primary-red) 0%, var(--primary-dark-red) 100%);
+            border-radius: 12px;
+            margin: 8px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(230,0,18,0.2);
+        }
+
+        .timeline-text {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--white);
+            font-size: 0.8em;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Footer with Fidelidade branding */
+        .footer {
+            background: var(--dark-gray);
+            color: var(--white);
+            text-align: center;
+            padding: 30px 60px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .footer .brand {
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header, .content, .nav-container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .header h1 { font-size: 2.2em; }
+            .header .logo-section { display: none; }
+            .nav { gap: 20px; flex-wrap: wrap; }
+            .summary-grid { grid-template-columns: 1fr; }
+            table { font-size: 0.8em; }
+            th, td { padding: 12px 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .section-body { padding: 20px; }
+            .nav a { padding: 8px 12px; font-size: 0.9em; }
+        }
+
+        /* Loading animation */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-section">GIT ORACLE MAGIC</div>
+        <div class="header-content">
+            <h1>Repository Analysis Report</h1>
+            <div class="subtitle">
+                <strong>{{REPOSITORY_NAME}}</strong><br>
+                {{ANALYSIS_PERIOD}} • Generated {{GENERATED_DATE}}
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <div class="nav">
+            <a href="#summary">📊 Executive Summary</a>
+            <a href="#files">📄 File Analysis</a>
+            <a href="#contributors">👥 Contributors</a>
+            <a href="#coupling">🔗 Coupling Analysis</a>
+            <a href="#timeline">📈 Timeline</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="summary" class="section">
+            <div class="section-header">
+                <h2>📊 Executive Summary</h2>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    {{SUMMARY_CARDS}}
+                </div>
+            </div>
+        </div>
+
+        <div id="files" class="section">
+            <div class="section-header">
+                <h2>📄 {{FILE_ANALYSIS_TITLE}}</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>File Path</th>
+                            <th>Changes</th>
+                            <th>First Change</th>
+                            <th>Last Change</th>
+                            <th>Top Contributors</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{FILE_ANALYSIS_ROWS}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="contributors" class="section">
+            <div class="section-header">
+                <h2>👥 Top Contributors</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Commits</th>
+                            <th>Lines Added</th>
+                            <th>Lines Deleted</th>
+                            <th>Total Lines</th>
+                            <th>Avg/Commit</th>
+                            <th>First Commit</th>
+                            <th>Last Commit</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{CONTRIBUTORS_ROWS}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="coupling" class="section">
+            <div class="section-header">
+                <h2>🔗 {{COUPLING_ANALYSIS_TITLE}}</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>File 1</th>
+                            <th>File 2</th>
+                            <th>Coupled Changes</th>
+                            <th>Coupling Strength</th>
+                            <th>Last Shared Change</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{COUPLING_ROWS}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="timeline" class="section">
+            <div class="section-header">
+                <h2>📈 Commit Timeline ({{TIMELINE_PERIOD}})</h2>
+            </div>
+            <div class="section-body">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Activity Visualization</th>
+                            <th>Commits</th>
+                            <th>Top Contributors</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{TIMELINE_ROWS}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <p><strong class="brand">{{GENERATED_BY}}</strong> v{{VERSION}}</p>
+            <p>Professional Repository Analysis • Generated {{GENERATED_DATE}}</p>
+            <p>{{REPOSITORY_PATH}}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
